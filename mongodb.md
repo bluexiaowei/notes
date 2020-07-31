@@ -18,11 +18,11 @@ sudo apt-get install -y mongodb-org
 $ sudo systemctl start mongod
 Failed to start mongod.service: Unit mongod.service not found.
 
-sudo systemctl daemon-reload
+$ sudo systemctl daemon-reload
 
-sudo systemctl status mongod
+$ sudo systemctl status mongod
 
-sudo systemctl enable mongod
+$ sudo systemctl enable mongod
 
 ```
 
@@ -34,6 +34,7 @@ sudo service mongod stop
 sudo apt-get purge mongodb-org*
 
 sudo rm -r /var/log/mongodb
+
 sudo rm -r /var/lib/mongodb
 ```
 
@@ -87,22 +88,17 @@ sudo rm -r /var/lib/mongodb
 
 `mongodb://username:password@host1:port1`
 
-## 注意
-
-保留数据库名称 admin、local 和 config 。
-
-由于 ObjectId 中保存了创建的时间戳，所以你不需要为你的文档保存时间戳字段，你可以通过 getTimestamp 函数来获取文档的创建时间
-
 ## 创建用户
 
-创建管理员用户
-
 ```shell
+use admin;
+
 db.createUser({
     user: "admin",
-    pwd: "123456",
+    pwd: "SF6aToyP9LoEyrle",
     roles: [ { role: "userAdminAnyDatabase", db: "admin"} ]
-})
+});
+
 Successfully added user: {
         "user" : "admin",
         "roles" : [
@@ -112,18 +108,6 @@ Successfully added user: {
                 }
         ]
 }
-```
-
-创建数据库用户
-
-```shell
-db.createUser({
-    user : "my_tester",
-    pwd : "123456",
-    roles: [
-        { role : "readWrite", db : "test" },
-    ]
-})
 ```
 
 | RoleName             | remark                             |
@@ -144,3 +128,33 @@ db.createUser({
 | clusterMonitor       | 监控集群的权限                     |
 | hostManager          | 管理 Server                        |
 | root                 | 超级用户                           |
+
+## 注意
+
+### 保留名称
+
+保留数据库名称 admin、local 和 config 。
+
+### 远程连接
+
+如果你的数据库用户不是在 admin 数据库里面创建的要指定 `authSource=xxx`, 默认值：`authSource=admin`
+
+`mongodb://xx:xx@localhost/xx?authSource=xxx`;
+
+### ObjectId
+
+由于 ObjectId 中保存了创建的时间戳，所以你不需要为你的文档保存创建时间戳字段，你可以通过 getTimestamp 函数来获取文档的创建时间。
+
+利用 `ObjectId` 的生成规则去筛选创建时间。
+
+```javascript
+function objectIdWithTimestamp(timestamp) {
+  if (typeof timestamp == "string") {
+    timestamp = new Date(timestamp);
+  }
+
+  const hexSeconds = Math.floor(timestamp / 1000).toString(16);
+
+  return ObjectId(hexSeconds + "0000000000000000");
+}
+```

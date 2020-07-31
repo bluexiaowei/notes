@@ -74,5 +74,15 @@ Registry Mirrors:
 
 ```
 
+## 权限
+
+```shell
+sudo groupadd docker
+
+sudo usermod -aG docker $USER
+
+newgrp docker 
+```
+
 ## 使用
 
