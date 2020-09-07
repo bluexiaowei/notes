@@ -36,8 +36,25 @@ sudo docker run \
   --mount source=mongodb,target=/data/db \
   --mount source=mongocfg,target=/data/configdb \
   --mount type=bind,source=/etc/mongo/mongod.conf,target=/etc/mongod.conf.orig \
-  mongo \
-  --auth 
+  mongo
+```
+
+or
+
+```shell
+sudo docker pull mongo:latest
+
+sudo docker volume create mongodb
+
+sudo docker volume create mongocfg
+
+sudo docker run \
+  -itd \
+  -p 27017:27017 \
+  --name mongo \
+  -v mongodb:/data/db \
+  -v mongocfg:/data/configdb \
+  mongo
 ```
 
 ### 创建用户
@@ -49,7 +66,7 @@ root@d03d2a6318ae:/# mongo
 
 > use admin;
 
-> db.createUser({ user:'admin',pwd:'SF6aToyP9LoEyrle',roles:[ { role:'userAdminAnyDatabase', db: 'admin'}]});
+> db.createUser({ user:'admin',pwd:'admin',roles:[ { role:'userAdminAnyDatabase', db: 'admin'}]});
 
 Successfully added user: {
 	"user" : "admin",
